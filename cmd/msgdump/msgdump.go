@@ -1,27 +1,46 @@
 package main
 
 import (
-	"fmt"
 	"os"
+	"time"
 
 	"github.com/daver76/go-yolink"
+	log "github.com/sirupsen/logrus"
 )
 
 func main() {
+	log.SetLevel(log.InfoLevel)
+	log.SetFormatter(
+		&log.TextFormatter{TimestampFormat: "2006-01-02 15:04:05", FullTimestamp: true},
+	)
+
 	client, err := yolink.NewAPIClient(
 		os.Getenv("YOLINK_UAID"),
 		os.Getenv("YOLINK_SECRET_KEY"),
 	)
 	if err != nil {
-		fmt.Println("Error:", err)
+		log.Error(err)
 		return
 	}
-	fmt.Println("client:", client)
 
-	home_id, err := client.GetHomeId()
+	client.MqttMessageHandler = messageHandler
+
+	log.Info("Connecting to MQTT...")
+	err = client.MQTTConnect()
 	if err != nil {
-		fmt.Println("Error:", err)
+		log.Error(err)
 		return
 	}
-	fmt.Println("home_id:", home_id)
+
+	for {
+		log.Debug("Waiting...")
+		time.Sleep(10 * time.Second)
+	}
+}
+
+func messageHandler(topic string, payload []byte) {
+	log.WithFields(log.Fields{
+		"topic":   topic,
+		"payload": string(payload),
+	}).Info("Received message")
 }

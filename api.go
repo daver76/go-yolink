@@ -26,7 +26,8 @@ type apiClient struct {
 	RefreshToken string
 
 	// Set by getHomeId
-	HomeId string
+	HomeId             string
+	MqttMessageHandler MessageHandler
 
 	// internal
 	http http.Client
