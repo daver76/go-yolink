@@ -19,7 +19,7 @@ create table mqtt_messages(
     home_id text,
     dev_id text,
     time timestamp with time zone,
-    data jsonb
+    payload jsonb
 );
 create index dev_time on mqtt_messages(dev_id, time);
 

@@ -95,7 +95,7 @@ func saveMessage(conn *pgx.Conn, topic string, payload []byte) error {
 	}
 	_, err = conn.Exec(
 		context.Background(),
-		"INSERT INTO mqtt_messages(home_id, dev_id, time, data) VALUES ($1, $2, to_timestamp($3), $4)",
+		"INSERT INTO mqtt_messages(home_id, dev_id, time, payload) VALUES ($1, $2, to_timestamp($3), $4)",
 		home_id,
 		dev_id,
 		timestamp,
