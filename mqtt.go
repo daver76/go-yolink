@@ -68,7 +68,7 @@ func (client *apiClient) mqttReconnectHandler(mqttClient mqtt.Client, options *m
 }
 
 func (client *apiClient) mqttConnectionLost(mqttClient mqtt.Client, err error) {
-	log.Warn("MQTT Connection Lost", err)
+	log.Warn("MQTT Connection Lost: ", err)
 }
 
 func randomString(n int) string {

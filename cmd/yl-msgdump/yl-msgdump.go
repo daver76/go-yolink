@@ -1,8 +1,11 @@
 package main
 
+// Connects to YoLink MQTT broker and displays messages as they are received
+
 import (
 	"os"
-	"time"
+	"os/signal"
+	"syscall"
 
 	"github.com/daver76/go-yolink"
 	log "github.com/sirupsen/logrus"
@@ -25,17 +28,19 @@ func main() {
 
 	client.MqttMessageHandler = messageHandler
 
-	log.Info("Connecting to MQTT...")
+	log.Info("Connecting to MQTT broker...")
 	err = client.MQTTConnect()
 	if err != nil {
 		log.Error(err)
 		return
 	}
 
-	for {
-		log.Debug("Waiting...")
-		time.Sleep(10 * time.Second)
-	}
+	log.Info("Waiting for messages...")
+	// Run forever, until a signal is received.
+	keepAlive := make(chan os.Signal, 1)
+	signal.Notify(keepAlive, os.Interrupt, syscall.SIGTERM)
+	<-keepAlive
+	log.Warn("Shutting down...")
 }
 
 func messageHandler(topic string, payload []byte) {
