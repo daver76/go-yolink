@@ -16,7 +16,7 @@ const (
 
 type MessageHandler func(topic string, body []byte)
 
-func (client *apiClient) MQTTConnect() error {
+func (client *APIClient) MQTTConnect() error {
 	opts := mqtt.NewClientOptions()
 	opts.AddBroker(fmt.Sprintf("tcp://%s:%d", API_HOST, MQTT_PORT))
 	opts.SetClientID(randomString(20))
@@ -41,7 +41,7 @@ func (client *apiClient) MQTTConnect() error {
 	return nil
 }
 
-func (client *apiClient) messageHandler(mqttClient mqtt.Client, msg mqtt.Message) {
+func (client *APIClient) messageHandler(mqttClient mqtt.Client, msg mqtt.Message) {
 	if client.MqttMessageHandler != nil {
 		client.MqttMessageHandler(msg.Topic(), msg.Payload())
 	} else {
@@ -52,11 +52,11 @@ func (client *apiClient) messageHandler(mqttClient mqtt.Client, msg mqtt.Message
 	}
 }
 
-func (client *apiClient) mqttConnectionHandler(mqttClient mqtt.Client) {
+func (client *APIClient) mqttConnectionHandler(mqttClient mqtt.Client) {
 	log.Info("MQTT Connected")
 }
 
-func (client *apiClient) mqttReconnectHandler(mqttClient mqtt.Client, options *mqtt.ClientOptions) {
+func (client *APIClient) mqttReconnectHandler(mqttClient mqtt.Client, options *mqtt.ClientOptions) {
 	log.Warn("MQTT Reconnecting...")
 	// It is possible the old token expired, so just in case:
 	_, err := client.getToken(false)
@@ -67,7 +67,7 @@ func (client *apiClient) mqttReconnectHandler(mqttClient mqtt.Client, options *m
 	options.Username = client.AccessToken
 }
 
-func (client *apiClient) mqttConnectionLost(mqttClient mqtt.Client, err error) {
+func (client *APIClient) mqttConnectionLost(mqttClient mqtt.Client, err error) {
 	log.Warn("MQTT Connection Lost: ", err)
 }
 

@@ -3,6 +3,7 @@ module github.com/daver76/go-yolink
 go 1.19
 
 require (
+	github.com/alecthomas/kong v0.6.1
 	github.com/eclipse/paho.mqtt.golang v1.4.1
 	github.com/jackc/pgx/v4 v4.17.0
 	github.com/mitchellh/mapstructure v1.5.0

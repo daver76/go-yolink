@@ -16,7 +16,7 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-type apiClient struct {
+type APIClient struct {
 	// User Access Credentials from YoLink app:
 	UAID      string
 	SecretKey string
@@ -37,17 +37,16 @@ type JsonResponse map[string]any
 type JsonRequest map[string]any
 
 type Device struct {
-	DeviceID   string
-	DeviceUUID string
-	Token      string
-	Name       string
-	Type       string
+	DeviceID string
+	Token    string
+	Name     string
+	Type     string
 }
 
 var ErrInvalidFormat = errors.New("invalid format")
 
-func NewAPIClient(uaid, secretKey string) (*apiClient, error) {
-	client := apiClient{UAID: uaid, SecretKey: secretKey}
+func NewAPIClient(uaid, secretKey string) (*APIClient, error) {
+	client := APIClient{UAID: uaid, SecretKey: secretKey}
 	client.http = http.Client{Timeout: time.Duration(5) * time.Second}
 
 	_, err := client.getToken(false)
@@ -64,7 +63,7 @@ func NewAPIClient(uaid, secretKey string) (*apiClient, error) {
 	return &client, nil
 }
 
-func (c *apiClient) GetHomeId() (string, error) {
+func (c *APIClient) GetHomeId() (string, error) {
 	if c.HomeId != "" {
 		// use previous result
 		return c.HomeId, nil
@@ -91,7 +90,7 @@ func (c *apiClient) GetHomeId() (string, error) {
 	return c.HomeId, nil
 }
 
-func (c *apiClient) GetDevices() ([]Device, error) {
+func (c *APIClient) GetDevices() ([]Device, error) {
 	devices := make([]Device, 0)
 
 	response, err := c.apiRequest(
@@ -121,10 +120,20 @@ func (c *apiClient) GetDevices() ([]Device, error) {
 	return devices, nil
 }
 
+func (c *APIClient) GetState(d Device) (JsonResponse, error) {
+	return c.apiRequest(
+		JsonRequest{
+			"method":       fmt.Sprintf("%s.getState", d.Type),
+			"targetDevice": d.DeviceID,
+			"token":        d.Token,
+		},
+	)
+}
+
 // Private methods:
 
 // Requests access token from UAID and Secret Key
-func (c *apiClient) getToken(refresh bool) (JsonResponse, error) {
+func (c *APIClient) getToken(refresh bool) (JsonResponse, error) {
 	r := make(JsonResponse)
 	form := url.Values{}
 	if refresh {
@@ -178,7 +187,7 @@ func (c *apiClient) getToken(refresh bool) (JsonResponse, error) {
 }
 
 // Makes a generic API JSON request and returns response
-func (c *apiClient) apiRequest(body JsonRequest) (JsonResponse, error) {
+func (c *APIClient) apiRequest(body JsonRequest) (JsonResponse, error) {
 	r := make(JsonResponse)
 	js, err := json.Marshal(body)
 	if err != nil {
