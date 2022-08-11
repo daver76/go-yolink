@@ -1,5 +1,7 @@
 package main
 
+// CLI utility to query device state
+
 import (
 	"encoding/json"
 	"fmt"

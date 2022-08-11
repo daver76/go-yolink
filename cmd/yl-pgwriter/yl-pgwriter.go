@@ -1,7 +1,7 @@
 package main
 
 // Connects to YoLink MQTT broker and writes messages to Postgres
-// see ../../postgres_setup.sql
+// see postgres_setup.sql
 
 import (
 	"context"
