@@ -32,12 +32,14 @@ func (client *APIClient) MQTTConnect() error {
 	if token := mqttClient.Connect(); token.Wait() && token.Error() != nil {
 		return token.Error()
 	}
+	return nil
+}
 
-	if token := mqttClient.Subscribe(fmt.Sprintf("yl-home/%s/+/report", client.HomeId),
-		0, nil); token.Wait() && token.Error() != nil {
+func (client *APIClient) subscribe(mqttClient mqtt.Client) error {
+	if token := mqttClient.Subscribe(
+		fmt.Sprintf("yl-home/%s/+/report", client.HomeId), 0, nil); token.Wait() && token.Error() != nil {
 		return token.Error()
 	}
-
 	return nil
 }
 
@@ -54,6 +56,10 @@ func (client *APIClient) messageHandler(mqttClient mqtt.Client, msg mqtt.Message
 
 func (client *APIClient) mqttConnectionHandler(mqttClient mqtt.Client) {
 	log.Info("MQTT Connected")
+	err := client.subscribe(mqttClient)
+	if err != nil {
+		log.Error("Unable to subscribe: ", err)
+	}
 }
 
 func (client *APIClient) mqttReconnectHandler(mqttClient mqtt.Client, options *mqtt.ClientOptions) {
